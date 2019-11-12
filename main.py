@@ -3,8 +3,6 @@
 Documentation
 
 See also https://www.python-boilerplate.com/flask
-
-test
 """
 import os
 
