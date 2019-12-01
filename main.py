@@ -30,13 +30,17 @@ def create_app(config=None):
     def hello_world():
         return "Hello World"
 
-    @app.route("/add_user", methods=["POST"])
-    def add_user():
+    @app.route("/post_score", methods=["POST"])
+    def post_score():
         try:
             try:
                 body = ast.literal_eval(json.dumps(request.get_json()))
             except:
                 return "", 400
+            records_fetched = user_collection.find_one({ "name": body["name"] })
+            if records_fetched != None:
+                user_collection.update_one({ "name": body["name"] }, { "$set": { "score": body["score"] } })
+                return "", 201
             record_created = user_collection.insert(body)
             if isinstance(record_created, list):
                 return jsonify([str(v) for v in record_created]), 201
@@ -45,8 +49,8 @@ def create_app(config=None):
         except:
             return "", 500
 
-    @app.route("/get_user/<user_name>", methods=['GET'])
-    def get_user(user_name):
+    @app.route("/get_score/<user_name>", methods=['GET'])
+    def get_score(user_name):
         try:
             records_fetched = user_collection.find_one({ "name": user_name })
             if records_fetched != None:
