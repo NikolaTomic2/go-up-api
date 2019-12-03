@@ -13,9 +13,9 @@ import pymongo
 import ast
 import json
 
-client = pymongo.MongoClient("localhost", 27017)
+client = pymongo.MongoClient("mongodb+srv://a:a@cluster0-4pu9k.mongodb.net/test?retryWrites=true&w=majority")
 db = client.restfulapi
-user_collection = db.users
+score_collection = db.scores
 
 
 def create_app(config=None):
@@ -30,18 +30,18 @@ def create_app(config=None):
     def hello_world():
         return "Hello World"
 
-    @app.route("/post_score", methods=["POST"])
+    @app.route("/score", methods=["POST"])
     def post_score():
         try:
             try:
                 body = ast.literal_eval(json.dumps(request.get_json()))
             except:
                 return "", 400
-            records_fetched = user_collection.find_one({ "name": body["name"] })
+            records_fetched = score_collection.find_one({ "name": body["name"] })
             if records_fetched != None:
-                user_collection.update_one({ "name": body["name"] }, { "$set": { "score": body["score"] } })
+                score_collection.update_one({ "name": body["name"] }, { "$set": { "score": body["score"] } })
                 return "", 201
-            record_created = user_collection.insert(body)
+            record_created = score_collection.insert(body)
             if isinstance(record_created, list):
                 return jsonify([str(v) for v in record_created]), 201
             else:
@@ -49,10 +49,10 @@ def create_app(config=None):
         except:
             return "", 500
 
-    @app.route("/get_score/<user_name>", methods=['GET'])
+    @app.route("/score/<user_name>", methods=['GET'])
     def get_score(user_name):
         try:
-            records_fetched = user_collection.find_one({ "name": user_name })
+            records_fetched = score_collection.find_one({ "name": user_name })
             if records_fetched != None:
                 return dumps(records_fetched)
             else:
