@@ -59,8 +59,26 @@ def get_score(user_name):
     except:
         return "", 500
 
+@app.route("/score/<user_name>", methods=['DELETE'])
+def delete_score(user_name):
+    try:
+        records_fetched = score_collection.find_one({ "name": user_name })
+        if records_fetched == None:
+            return "User not found", 404
+        score_collection.delete_one({ "name": user_name })
+        return "", 200
+    except:
+        return "", 500
 
-def main(a=None, b=None):
+@app.route("/scores", methods=['GET'])
+def get_scores():
+    try:
+        return dumps(score_collection.find()), 201
+    except:
+        return "", 500
+
+
+def main():
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)
 
